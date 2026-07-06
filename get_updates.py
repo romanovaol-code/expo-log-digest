@@ -26,10 +26,10 @@ import requests
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
-LOG_CHAT_ID = int(os.environ["LOG_CHAT_ID"])
-REPORT_CHAT_ID = int(os.environ["REPORT_CHAT_ID"])
-TIMEZONE = os.environ.get("TIMEZONE", "Europe/Moscow")
+TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"].strip()
+LOG_CHAT_ID = int(os.environ["LOG_CHAT_ID"].strip())
+REPORT_CHAT_ID = int(os.environ["REPORT_CHAT_ID"].strip())
+TIMEZONE = os.environ.get("TIMEZONE", "Europe/Moscow").strip()
 
 OFFSET_FILE = "offset.json"
 API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
