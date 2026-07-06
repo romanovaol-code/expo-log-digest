@@ -1,0 +1,42 @@
+name: Дневная выжимка из лога проекта
+
+on:
+  schedule:
+    # 15:00 UTC = 18:00 по Москве (в России нет перехода на летнее время,
+    # поэтому смещение фиксированное, менять не нужно)
+    - cron: "0 15 * * *"
+  workflow_dispatch: {}   # позволяет запускать вручную кнопкой в вкладке Actions
+
+permissions:
+  contents: write   # нужно, чтобы скрипт мог закоммитить обновлённый offset.json
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run digest script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          LOG_CHAT_ID: ${{ secrets.LOG_CHAT_ID }}
+          REPORT_CHAT_ID: ${{ secrets.REPORT_CHAT_ID }}
+          TIMEZONE: "Europe/Moscow"
+        run: python get_updates.py
+
+      - name: Save updated offset back to repo
+        run: |
+          git config user.name "digest-bot"
+          git config user.email "digest-bot@users.noreply.github.com"
+          git add offset.json
+          git diff --quiet --cached || git commit -m "Обновление offset"
+          git push
